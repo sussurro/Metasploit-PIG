@@ -86,7 +86,7 @@ class Metasploit3 < Msf::Auxiliary
 		end
 
 		print_status("Sniffing traffic.....")
-		RubyProf.start
+		#RubyProf.start
 		open_pcap
 		i = 0
 		each_packet do |pkt|
@@ -97,11 +97,12 @@ class Metasploit3 < Msf::Auxiliary
 			end
 		end
 		close_pcap
-		result = RubyProf.stop
-		printer = RubyProf::GraphPrinter.new(result)
-		myfile = open("/tmp/ttqq","w+")
-  		printer.print(myfile, {})
-		print_status("Finished sniffing")
+		print_status("Done")
+		#result = RubyProf.stop
+		#printer = RubyProf::CallTreePrinter.new(result)
+		#myfile = open("/tmp/ttqq","w+")
+  		#printer.print(myfile, {:min_percent => '20'})
+		#print_status("Finished sniffing")
 	end
 end
 
@@ -148,6 +149,9 @@ class PigParser
 
 	def report_note(*s)
 		self.module.report_note(*s)
+	end
+	def store_loot(*s)
+		self.module.store_loot(*s)
 	end
 
 end
