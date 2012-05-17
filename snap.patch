@@ -1,0 +1,36 @@
+Index: lib/packetfu/packetfu/packet.rb
+===================================================================
+--- lib/packetfu/packetfu/packet.rb	(revision 15118)
++++ lib/packetfu/packetfu/packet.rb	(working copy)
+@@ -514,7 +514,7 @@
+ 		end
+ 
+ 		def respond_to?(sym, include_private = false)
+-			if sym.to_s =~ /^(invalid|eth|arp|ip|icmp|udp|hsrp|tcp|ipv6)_/
++			if sym.to_s =~ /^(invalid|eth|arp|ip|icmp|udp|hsrp|tcp|ipv6|snap)_/
+ 				self.instance_variable_get("@#{$1}_header").respond_to? sym
+ 			elsif sym.to_s =~ /^is_([a-zA-Z0-9]+)\?/
+ 				if PacketFu.packet_prefixes.index($1)
+Index: lib/packetfu/packetfu/protos/eth.rb
+===================================================================
+--- lib/packetfu/packetfu/protos/eth.rb	(revision 15118)
++++ lib/packetfu/packetfu/protos/eth.rb	(working copy)
+@@ -181,6 +181,9 @@
+ 			self[:eth_dst].read str[0,6]
+ 			self[:eth_src].read str[6,6]
+ 			self[:eth_proto].read str[12,2]
++			if self[:eth_proto].to_i < 1500
++				self[:eth_proto] = nil
++			end
+ 			self[:body].read str[14,str.size]
+ 			self
+ 		end
+@@ -266,7 +269,7 @@
+ 			valid_eth_types = [0x0800, 0x0806, 0x86dd]
+ 			return false unless str.size >= 14
+ 			type = str[12,2].unpack("n").first rescue nil
+-			return false unless valid_eth_types.include? type
++			return false unless valid_eth_types.include? type or type < 1500
+ 			true
+ 		end
+ 
